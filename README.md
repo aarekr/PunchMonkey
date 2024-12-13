@@ -1,2 +1,3 @@
-# PunchMonkey
-Punch Monkey game
+# Punch Monkey game
+
+Programming language: Python
