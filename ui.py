@@ -2,6 +2,8 @@
 
 import sys
 import pygame
+import time
+import random
 
 BLACK = (0, 0, 0)
 BLUE = (0, 0, 255)
@@ -11,6 +13,7 @@ RED = (255, 0, 0)
 
 BOARD_SIZE = (950, 750)
 RADIUS = 50
+DEFAULT_IMAGE_SIZE = (70, 70)
 
 def game_start_text():
     """ Displaying game start text """
@@ -24,6 +27,7 @@ class UI:
     def __init__(self):
         self.game_active = True
         self.screen = pygame.display.set_mode(BOARD_SIZE)
+        self.interval = 2
 
     def start_game(self):
         self.game_loop()
@@ -41,7 +45,8 @@ class UI:
     def game_loop(self):
         pygame.init()
         self.screen.blit(game_start_text(), (250, 15))
-        #self.draw_ellipses()
+        monkey_image = pygame.image.load("assets/monkey_eyes_covered.jpg")
+        monkey_image = pygame.transform.scale(monkey_image, DEFAULT_IMAGE_SIZE)
         pygame.display.update()
 
         print("Game started")
@@ -49,4 +54,14 @@ class UI:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
-                self.draw_ellipses()
+
+            time.sleep(self.interval)
+            self.interval -= 0.01
+            print("changing monkey position, interval:", self.interval)
+            self.screen.fill(BLACK)
+            self.screen.blit(game_start_text(), (250, 15))
+            self.draw_ellipses()
+            x = random.choice([100, 300, 500, 700]) + 18
+            y = random.choice([200, 350, 500, 650]) - 60
+            self.screen.blit(monkey_image, (x,y))
+            pygame.display.update()
