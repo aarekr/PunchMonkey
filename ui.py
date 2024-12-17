@@ -70,13 +70,7 @@ class UI:
 
         print("Game started")
         while self.game_active:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    sys.exit()
-
-            time.sleep(self.interval)
             self.interval -= 0.01
-            print("changing monkey position, interval:", self.interval)
             self.screen.fill(WHITE)
             self.screen.blit(game_top_text(), (250, 15))
             self.draw_ellipses()
@@ -84,3 +78,20 @@ class UI:
             y = random.choice([200, 350, 500, 650]) - 60
             self.screen.blit(monkey_image, (x,y))
             pygame.display.update()
+            time.sleep(self.interval)
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    clicked_position = event.pos
+                    print("clicked_position:", clicked_position)
+                    print("monkey_position :", x, y)
+                    print("x difference    :", clicked_position[0] - x)
+                    print("y difference    :", clicked_position[1] - y)
+                    if x <= clicked_position[0] <= x+70:
+                        if y <= clicked_position[1] <= y+70:
+                            print("hit")
+                    print("----------------------------------------")
+
+            
