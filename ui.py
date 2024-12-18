@@ -35,6 +35,7 @@ class UI:
         self.game_active = True
         self.screen = pygame.display.set_mode(BOARD_SIZE)
         self.interval = 2
+        self.points = 0
 
     def start_game(self):
         pygame.init()
@@ -47,6 +48,7 @@ class UI:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_s:
                         start_game = True
+                        self.points = 0
             if start_game == True:
                 break
         self.game_loop()
@@ -61,6 +63,13 @@ class UI:
             y += 150
         pygame.display.update()
 
+    def display_points(self):
+        """ Displaying game points """
+        text_font = pygame.font.Font(pygame.font.get_default_font(), 30)
+        points_text = f"Points {self.points}"
+        label = text_font.render(points_text, 0, BLUE)
+        return label
+
     def game_loop(self):
         pygame.init()
         self.screen.blit(game_top_text(), (250, 15))
@@ -73,12 +82,14 @@ class UI:
             self.interval -= 0.01
             self.screen.fill(WHITE)
             self.screen.blit(game_top_text(), (250, 15))
+            self.screen.blit(self.display_points(), (770, 20))
             self.draw_ellipses()
             x = random.choice([100, 300, 500, 700]) + 18
             y = random.choice([200, 350, 500, 650]) - 60
             self.screen.blit(monkey_image, (x,y))
             pygame.display.update()
             time.sleep(self.interval)
+            loop_start = time.time()
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -92,6 +103,7 @@ class UI:
                     if x <= clicked_position[0] <= x+70:
                         if y <= clicked_position[1] <= y+70:
                             print("hit")
+                            loop_end = time.time()
+                            print("---", loop_end - loop_start)
+                            self.points += 1
                     print("----------------------------------------")
-
-            
