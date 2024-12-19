@@ -70,6 +70,12 @@ class UI:
         label = text_font.render(points_text, 0, BLUE)
         return label
 
+    def draw_main_items(self):
+        self.screen.fill(WHITE)
+        self.screen.blit(game_top_text(), (250, 15))
+        self.screen.blit(self.display_points(), (770, 20))
+        self.draw_ellipses()
+
     def game_loop(self):
         pygame.init()
         self.screen.blit(game_top_text(), (250, 15))
@@ -79,11 +85,10 @@ class UI:
 
         print("Game started")
         while self.game_active:
+            self.draw_main_items()
+            time.sleep(random.choice([1,2,3,4,5]))
+            self.draw_main_items()
             self.interval -= 0.01
-            self.screen.fill(WHITE)
-            self.screen.blit(game_top_text(), (250, 15))
-            self.screen.blit(self.display_points(), (770, 20))
-            self.draw_ellipses()
             x = random.choice([100, 300, 500, 700]) + 18
             y = random.choice([200, 350, 500, 650]) - 60
             self.screen.blit(monkey_image, (x,y))
@@ -104,6 +109,5 @@ class UI:
                         if y <= clicked_position[1] <= y+70:
                             print("hit")
                             loop_end = time.time()
-                            print("---", loop_end - loop_start)
                             self.points += 1
                     print("----------------------------------------")
