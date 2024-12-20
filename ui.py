@@ -13,7 +13,8 @@ RED = (255, 0, 0)
 
 BOARD_SIZE = (950, 750)
 RADIUS = 50
-DEFAULT_IMAGE_SIZE = (70, 70)
+MONKEY_IMAGE_SIZE = (70, 70)
+BANANA_IMAGE_SIZE = (100, 70)
 
 def game_top_text():
     """ Displaying Punch Monkey text """
@@ -34,8 +35,10 @@ class UI:
     def __init__(self):
         self.game_active = True
         self.screen = pygame.display.set_mode(BOARD_SIZE)
-        self.interval = 2
+        self.interval = 5
         self.points = 0
+        self.x_banana = 0
+        self.y_banana = 0
 
     def start_game(self):
         pygame.init()
@@ -76,14 +79,24 @@ class UI:
         self.screen.blit(self.display_points(), (770, 20))
         self.draw_ellipses()
 
+    def change_banana_position(self, banana_image, x, y):
+        x_change = (x - self.x_banana) / 5
+        y_change = (y - self.y_banana) / 5
+        self.x_banana += x_change
+        self.y_banana += y_change
+        self.screen.blit(banana_image, (self.x_banana, self.y_banana))
+        pygame.display.update()
+
     def game_loop(self):
         pygame.init()
         self.screen.blit(game_top_text(), (250, 15))
         monkey_image = pygame.image.load("assets/monkey_eyes_covered.jpg")
-        monkey_image = pygame.transform.scale(monkey_image, DEFAULT_IMAGE_SIZE)
+        monkey_image = pygame.transform.scale(monkey_image, MONKEY_IMAGE_SIZE)
+        banana_image = pygame.image.load("assets/banana_angry.jpg")
+        banana_image = pygame.transform.scale(banana_image, BANANA_IMAGE_SIZE)
         pygame.display.update()
 
-        print("Game started")
+        print("\nGame started")
         while self.game_active:
             self.draw_main_items()
             time.sleep(random.choice([1,2,3,4,5]))
@@ -92,6 +105,10 @@ class UI:
             x = random.choice([100, 300, 500, 700]) + 18
             y = random.choice([200, 350, 500, 650]) - 60
             self.screen.blit(monkey_image, (x,y))
+            self.x_banana = 0
+            self.y_banana = 0
+            self.screen.blit(banana_image, (self.x_banana, self.y_banana))
+            print("banana location:", x, y)
             pygame.display.update()
             time.sleep(self.interval)
             loop_start = time.time()
@@ -101,6 +118,8 @@ class UI:
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     clicked_position = event.pos
+                    for _ in range(3):
+                        self.change_banana_position(banana_image, x, y)
                     print("clicked_position:", clicked_position)
                     print("monkey_position :", x, y)
                     print("x difference    :", clicked_position[0] - x)
