@@ -94,24 +94,29 @@ class UI:
         monkey_image = pygame.transform.scale(monkey_image, MONKEY_IMAGE_SIZE)
         banana_image = pygame.image.load("assets/banana_angry.jpg")
         banana_image = pygame.transform.scale(banana_image, BANANA_IMAGE_SIZE)
+        new_cursor = pygame.image.load("assets/banana_angry.jpg")
+        new_cursor = pygame.transform.scale(new_cursor, BANANA_IMAGE_SIZE)
+        pygame.mouse.set_visible(False)
         pygame.display.update()
 
         print("\nGame started")
+        x = random.choice([100, 300, 500, 700]) + 18
+        y = random.choice([200, 350, 500, 650]) - 60
+        step = 3000
         while self.game_active:
             self.draw_main_items()
-            time.sleep(random.choice([1,2,3,4,5]))
-            self.draw_main_items()
+            #time.sleep(random.choice([1,2,3,4,5]))
+            ticks = pygame.time.get_ticks()
+            if ticks > step:
+                step += 3000
+                x = random.choice([100, 300, 500, 700]) + 18
+                y = random.choice([200, 350, 500, 650]) - 60
+            #self.draw_main_items()
             self.interval -= 0.01
-            x = random.choice([100, 300, 500, 700]) + 18
-            y = random.choice([200, 350, 500, 650]) - 60
             self.screen.blit(monkey_image, (x,y))
-            self.x_banana = 0
-            self.y_banana = 0
-            self.screen.blit(banana_image, (self.x_banana, self.y_banana))
-            print("banana location:", x, y)
+            mouse_position = pygame.mouse.get_pos()
+            self.screen.blit(new_cursor, mouse_position)
             pygame.display.update()
-            time.sleep(self.interval)
-            loop_start = time.time()
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -127,6 +132,5 @@ class UI:
                     if x <= clicked_position[0] <= x+70:
                         if y <= clicked_position[1] <= y+70:
                             print("hit")
-                            loop_end = time.time()
                             self.points += 1
                     print("----------------------------------------")
