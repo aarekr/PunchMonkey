@@ -2,7 +2,6 @@
 
 import sys
 import pygame
-import time
 import random
 
 BLACK = (0, 0, 0)
@@ -14,7 +13,7 @@ RED = (255, 0, 0)
 BOARD_SIZE = (950, 750)
 RADIUS = 50
 MONKEY_IMAGE_SIZE = (70, 70)
-BANANA_IMAGE_SIZE = (100, 70)
+BANANA_IMAGE_SIZE = (90, 60)
 
 def game_top_text():
     """ Displaying Punch Monkey text """
@@ -39,6 +38,8 @@ class UI:
         self.points = 0
         self.x_banana = 0
         self.y_banana = 0
+        self.new_cursor = pygame.image.load("assets/banana_angry.jpg")
+        self.new_cursor = pygame.transform.scale(self.new_cursor, BANANA_IMAGE_SIZE)
 
     def start_game(self):
         pygame.init()
@@ -73,10 +74,13 @@ class UI:
         label = text_font.render(points_text, 0, BLUE)
         return label
 
-    def draw_main_items(self):
+    def draw_main_items(self, monkey_image, x, y, mouse_position, banana_given):
         self.screen.fill(WHITE)
         self.screen.blit(game_top_text(), (250, 15))
         self.screen.blit(self.display_points(), (770, 20))
+        if not banana_given:
+            self.screen.blit(monkey_image, (x,y))
+            self.screen.blit(self.new_cursor, mouse_position)
         self.draw_ellipses()
 
     def change_banana_position(self, banana_image, x, y):
@@ -94,28 +98,25 @@ class UI:
         monkey_image = pygame.transform.scale(monkey_image, MONKEY_IMAGE_SIZE)
         banana_image = pygame.image.load("assets/banana_angry.jpg")
         banana_image = pygame.transform.scale(banana_image, BANANA_IMAGE_SIZE)
-        new_cursor = pygame.image.load("assets/banana_angry.jpg")
-        new_cursor = pygame.transform.scale(new_cursor, BANANA_IMAGE_SIZE)
         pygame.mouse.set_visible(False)
         pygame.display.update()
 
         print("\nGame started")
-        x = random.choice([100, 300, 500, 700]) + 18
-        y = random.choice([200, 350, 500, 650]) - 60
+        x_monkey = random.choice([100, 300, 500, 700]) + 18
+        y_monkey = random.choice([200, 350, 500, 650]) - 60
+        banana_given = False
         step = 3000
         while self.game_active:
-            self.draw_main_items()
             #time.sleep(random.choice([1,2,3,4,5]))
             ticks = pygame.time.get_ticks()
             if ticks > step:
                 step += 3000
-                x = random.choice([100, 300, 500, 700]) + 18
-                y = random.choice([200, 350, 500, 650]) - 60
-            #self.draw_main_items()
+                x_monkey = random.choice([100, 300, 500, 700]) + 18
+                y_monkey = random.choice([200, 350, 500, 650]) - 60
+                banana_given = False
             self.interval -= 0.01
-            self.screen.blit(monkey_image, (x,y))
             mouse_position = pygame.mouse.get_pos()
-            self.screen.blit(new_cursor, mouse_position)
+            self.draw_main_items(monkey_image, x_monkey, y_monkey, mouse_position, banana_given)  # moved here
             pygame.display.update()
 
             for event in pygame.event.get():
@@ -124,13 +125,16 @@ class UI:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     clicked_position = event.pos
                     for _ in range(3):
-                        self.change_banana_position(banana_image, x, y)
+                        self.change_banana_position(banana_image, x_monkey, y_monkey)
                     print("clicked_position:", clicked_position)
-                    print("monkey_position :", x, y)
-                    print("x difference    :", clicked_position[0] - x)
-                    print("y difference    :", clicked_position[1] - y)
-                    if x <= clicked_position[0] <= x+70:
-                        if y <= clicked_position[1] <= y+70:
+                    print("monkey_position :", x_monkey, y_monkey)
+                    print("banana_position :", clicked_position[0], clicked_position[1])
+                    print("x difference    :", clicked_position[0] - x_monkey + 10)
+                    print("y difference    :", clicked_position[1] - y_monkey)
+                    if abs(clicked_position[0] - x_monkey + 10) < 70:
+                        if abs(clicked_position[1] - y_monkey) < 70:
                             print("hit")
                             self.points += 1
-                    print("----------------------------------------")
+                            banana_given = True
+                            print("----------------------------------------")
+                            break
