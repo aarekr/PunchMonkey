@@ -36,6 +36,7 @@ class UI:
         self.screen = pygame.display.set_mode(BOARD_SIZE)
         self.interval = 5
         self.points = 0
+        self.misses = 0
         self.x_banana = 0
         self.y_banana = 0
         self.new_cursor = pygame.image.load("assets/banana_angry.jpg")
@@ -74,10 +75,18 @@ class UI:
         label = text_font.render(points_text, 0, BLUE)
         return label
 
+    def display_misses(self):
+        """ Displaying misses """
+        text_font = pygame.font.Font(pygame.font.get_default_font(), 30)
+        misses_text = f"Missed {self.misses}"
+        label = text_font.render(misses_text, 0, BLUE)
+        return label
+
     def draw_main_items(self, monkey_image, x, y, mouse_position, banana_given):
         self.screen.fill(WHITE)
         self.screen.blit(game_top_text(), (250, 15))
         self.screen.blit(self.display_points(), (770, 20))
+        self.screen.blit(self.display_misses(), (770, 50))
         if not banana_given:
             self.screen.blit(monkey_image, (x,y))
             self.screen.blit(self.new_cursor, mouse_position)
@@ -126,15 +135,19 @@ class UI:
                     clicked_position = event.pos
                     for _ in range(3):
                         self.change_banana_position(banana_image, x_monkey, y_monkey)
+                    print("----------------------------------------")
                     print("clicked_position:", clicked_position)
                     print("monkey_position :", x_monkey, y_monkey)
                     print("banana_position :", clicked_position[0], clicked_position[1])
                     print("x difference    :", clicked_position[0] - x_monkey + 10)
                     print("y difference    :", clicked_position[1] - y_monkey)
-                    if abs(clicked_position[0] - x_monkey + 10) < 70:
-                        if abs(clicked_position[1] - y_monkey) < 70:
+                    if abs(clicked_position[0] - x_monkey + 10) <= 70:
+                        if abs(clicked_position[1] - y_monkey) <= 70:
                             print("hit")
                             self.points += 1
                             banana_given = True
-                            print("----------------------------------------")
                             break
+                    elif abs(clicked_position[0] - x_monkey + 10) > 70:
+                        if abs(clicked_position[1] - y_monkey) > 70:
+                            print("missed")
+                            self.misses += 1
