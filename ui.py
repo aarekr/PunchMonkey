@@ -41,6 +41,8 @@ class UI:
         self.y_banana = 0
         self.new_cursor = pygame.image.load("assets/banana_angry.jpg")
         self.new_cursor = pygame.transform.scale(self.new_cursor, BANANA_IMAGE_SIZE)
+        #self.monkey_happy = pygame.image.load("assets/monkey_happy.jpg")
+        #self.monkey_happy = pygame.transform.scale(self.monkey_happy, MONKEY_IMAGE_SIZE)
 
     def start_game(self):
         pygame.init()
@@ -59,6 +61,7 @@ class UI:
         self.game_loop()
     
     def draw_ellipses(self):
+        """ Drawing ellipses from which monkey appears """
         y = 200
         while y <= 700:
             x = 100
@@ -82,15 +85,27 @@ class UI:
         label = text_font.render(misses_text, 0, BLUE)
         return label
 
-    def draw_main_items(self, monkey_image, x, y, mouse_position, banana_given):
+    def draw_main_items(self, monkey_eyes_covered, x, y, mouse_position, banana_given):
         self.screen.fill(WHITE)
         self.screen.blit(game_top_text(), (250, 15))
         self.screen.blit(self.display_points(), (770, 20))
         self.screen.blit(self.display_misses(), (770, 50))
         if not banana_given:
-            self.screen.blit(monkey_image, (x,y))
+            self.screen.blit(monkey_eyes_covered, (x,y))
             self.screen.blit(self.new_cursor, mouse_position)
         self.draw_ellipses()
+
+    def draw_banana_given(self, x, y):
+        monkey_happy = pygame.image.load("assets/monkey_happy.jpg")
+        monkey_happy = pygame.transform.scale(monkey_happy, MONKEY_IMAGE_SIZE)
+        self.screen.fill(WHITE)
+        self.screen.blit(game_top_text(), (250, 15))
+        self.screen.blit(self.display_points(), (770, 20))
+        self.screen.blit(self.display_misses(), (770, 50))
+        self.screen.blit(monkey_happy, (x,y))
+        pygame.display.update()
+        self.draw_ellipses()
+        pygame.time.wait(2000)
 
     def change_banana_position(self, banana_image, x, y):
         x_change = (x - self.x_banana) / 5
@@ -103,8 +118,8 @@ class UI:
     def game_loop(self):
         pygame.init()
         self.screen.blit(game_top_text(), (250, 15))
-        monkey_image = pygame.image.load("assets/monkey_eyes_covered.jpg")
-        monkey_image = pygame.transform.scale(monkey_image, MONKEY_IMAGE_SIZE)
+        monkey_eyes_covered = pygame.image.load("assets/monkey_eyes_covered.jpg")
+        monkey_eyes_covered = pygame.transform.scale(monkey_eyes_covered, MONKEY_IMAGE_SIZE)
         banana_image = pygame.image.load("assets/banana_angry.jpg")
         banana_image = pygame.transform.scale(banana_image, BANANA_IMAGE_SIZE)
         pygame.mouse.set_visible(False)
@@ -125,7 +140,7 @@ class UI:
                 banana_given = False
             self.interval -= 0.01
             mouse_position = pygame.mouse.get_pos()
-            self.draw_main_items(monkey_image, x_monkey, y_monkey, mouse_position, banana_given)  # moved here
+            self.draw_main_items(monkey_eyes_covered, x_monkey, y_monkey, mouse_position, banana_given)
             pygame.display.update()
 
             for event in pygame.event.get():
@@ -146,8 +161,9 @@ class UI:
                             print("hit")
                             self.points += 1
                             banana_given = True
+                            self.draw_banana_given(x_monkey, y_monkey)
                             break
-                    elif abs(clicked_position[0] - x_monkey + 10) > 70:
-                        if abs(clicked_position[1] - y_monkey) > 70:
-                            print("missed")
-                            self.misses += 1
+                    elif abs(clicked_position[0] - x_monkey + 10) > 70 or\
+                        abs(clicked_position[1] - y_monkey) > 70:
+                        print("missed")
+                        self.misses += 1
